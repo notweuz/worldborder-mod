@@ -19,6 +19,7 @@ public class Commands {
                                 ConfigManager.getConfig().borderSize = DoubleArgumentType.getDouble(ctx, "size");
                                 ConfigManager.saveConfig();
                                 ctx.getSource().sendFeedback(() -> Text.literal("Border size set to " + ConfigManager.getConfig().borderSize), true);
+                                Effect.borderChanged(ctx.getSource().getServer());
                                 return 0;
                             })));
         }));
