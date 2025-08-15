@@ -1,0 +1,27 @@
+package ru.ntwz.worldborder.module;
+
+import com.mojang.brigadier.arguments.DoubleArgumentType;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.text.Text;
+import org.slf4j.Logger;
+import ru.ntwz.worldborder.config.ConfigManager;
+
+import java.util.Objects;
+
+public class Commands {
+    public static void registerCommands(Logger logger) {
+        CommandRegistrationCallback.EVENT.register(((commandDispatcher, commandRegistryAccess, registrationEnvironment) -> {
+            commandDispatcher.register(CommandManager.literal("border")
+                    .requires(src -> Objects.requireNonNull(src.getPlayer()).hasPermissionLevel(2))
+                    .then(CommandManager.argument("size", DoubleArgumentType.doubleArg())
+                            .executes(ctx -> {
+                                ConfigManager.getConfig().borderSize = DoubleArgumentType.getDouble(ctx, "size");
+                                ConfigManager.saveConfig();
+                                ctx.getSource().sendFeedback(() -> Text.literal("Border size set to " + ConfigManager.getConfig().borderSize), true);
+                                return 0;
+                            })));
+        }));
+        logger.info("Commands registered!");
+    }
+}

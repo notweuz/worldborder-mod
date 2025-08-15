@@ -8,7 +8,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
-import ru.ntwz.worldborder.config.BorderConfig;
+import ru.ntwz.worldborder.config.ConfigManager;
 
 public class WorldBorderTick {
     private int TICK_COUNTER = 0;
@@ -23,13 +23,10 @@ public class WorldBorderTick {
                 TICK_COUNTER++;
 
                 Vec3d playerPos = player.getPos();
-                double deltaX = playerPos.x - SPAWN_POS.x;
-                double deltaZ = playerPos.z - SPAWN_POS.z;
-                double horizontalDistance = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
-                float distanceFromBorder = (float) horizontalDistance;
+                float distanceFromBorder = Calculate.distance(playerPos, SPAWN_POS);
 
-                if (distanceFromBorder > BorderConfig.BORDER_SIZE) {
-                    if (TICK_COUNTER >= BorderConfig.SOUND_PER_TICKS) {
+                if (distanceFromBorder > ConfigManager.getConfig().borderSize) {
+                    if (TICK_COUNTER >= ConfigManager.getConfig().soundPerTick) {
                         TICK_COUNTER = 0;
                         player.playSoundToPlayer(SoundEvents.BLOCK_TRIAL_SPAWNER_AMBIENT_OMINOUS, SoundCategory.AMBIENT, distanceFromBorder / 28, .2f);
                     }
@@ -37,7 +34,7 @@ public class WorldBorderTick {
                     StatusEffectInstance EFFECT_INSTANCE = new StatusEffectInstance(StatusEffects.DARKNESS, 3 * 20, 1, true, false, false);
                     
                     player.addStatusEffect(EFFECT_INSTANCE);
-                    double distanceBeyondBorder = distanceFromBorder - BorderConfig.BORDER_SIZE;
+                    double distanceBeyondBorder = distanceFromBorder - ConfigManager.getConfig().borderSize;
                     float damage = (float) (distanceBeyondBorder * 0.1);
                     player.damage(world, world.getDamageSources().outsideBorder(), damage);
                 }
